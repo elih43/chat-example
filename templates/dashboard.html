@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}signin{% endblock %}
+{% block content %}
+
+
+<!--<h1>Dashboard | {% if user['username'] %} {{user['username']}} {% else %} {{user['user_id']}} {% endif %}</h1>-->
+<h1>Dashboard | {{user['username']}} | {{user['user_id']}}</h1>
+    
+
+
+<!--Conversations-->
+
+<h2>Conversations</h2>
+<ul>
+    {% if conversations %}
+    {% for conversation in conversations %}
+    <li><a href="{{url_for('view_conversation', conversation_id=conversation.id)}}">
+            {{conversation.title}}</a>
+    </li>
+    {% endfor %}
+    <br>
+    <li><a href="{{url_for('create_conversation')}}">Create Conversation</a></li>
+
+    {% else %}
+    <li>you do not have any open conversations</li>
+    <br>
+    <a href="{{url_for('create_conversation')}}">Create Conversation</a>
+    {% endif %}
+
+</ul>
+{% endblock %}

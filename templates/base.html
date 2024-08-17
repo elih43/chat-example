@@ -1,0 +1,28 @@
+<!doctype html>
+<title>{% block title %}{% endblock %}</title>
+
+{% if user %}
+<h1>Logged in as {{user['username']}} | {{user['user_id']}}</h1>
+{% else %}
+<h1>Not Logged in</h1>
+{% endif %}
+
+<nav>
+    <h1>NAV</h1>
+    <ul>
+        <li><a href="{{url_for('dashboard')}}">Dashboard</a>
+        <li><a href="{{url_for('login')}}">Login</a>
+        <li><a href="{{url_for('register')}}">Sign Up</a>
+        <li><a href="{{url_for('logout')}}">Log Out</a>
+
+    </ul>
+</nav>
+<section class="content">
+    <header>
+        {% block header %}{% endblock %}
+    </header>
+    {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div> 
+    {% endfor %}
+    {% block content %}{% endblock %}
+</section>

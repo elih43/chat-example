@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}{{conversation.title}}{% endblock %}
+{% block content %}
+<!--this doesnt work-->
+<h1>Title: {{conversation.title}}</h1>
+<button onclick="editTitle()">Edit Title</button>
+<script>
+    
+    function editTitle() {
+        var title = prompt("Enter new title");
+        if (title != null) {
+            fetch('/conversations/{{ conversation.id }}/edit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'title': title
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+    }
+</script>
+
+<!--Participants-->
+<h2>Participants</h2>
+
+<ul>
+    {% for participant in conversation.participants %}
+    <li>{{ participant['username'] }}</li>
+    {% endfor %}
+    <br>
+    <button onclick="addParticipant()">Add Participant</button>
+</ul>
+
+<!--Messages-->
+<h2>Messages</h2>
+<ul>
+    {% if messages %}
+    {% for message in messages %}
+    <li>{{message.sender_username}}: {{message.message_text}}</li>
+    {% endfor %}
+    {% endif %}
+</ul>
+
+
+<!--Conversation Form-->
+<form method="POST">
+    <div class="form-group">
+        <label for="message">Message</label>
+        <input type="text" name="message" id="message" required>
+    </div>
+
+    <!--SubmitButton-->
+    <div class="form-group">
+        <button class="btn btn-primary">Send Message</button>
+    </div>
+
+
+</form>
+
+<!--Delete Conversation-->
+<br>
+<br>
+<form method="POST" action="{{ url_for('view_conversation', conversation_id=conversation.id) }}">
+    <input type="hidden" name="_method" value="DELETE">
+    <button type="submit">Delete Conversation</button>
+</form>
+
+
+<script>
+    function addParticipant() {
+        var participant_id = prompt("Enter the ID of the participant:");
+        if (participant_id != null) {
+            fetch('/conversations/{{ conversation.id }}/add_participant', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'participant_id': participant_id
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Handle the error response
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.message);
+                    });
+                }
+                return response.json();  // Parse JSON if the response is ok
+            })
+            .then(data => {
+                console.log(data);
+                alert(data.message);  // Optional: Show an alert with the message
+                location.reload();     // Reload the page to reflect changes
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message);  // Show an alert in case of an error
+            });
+        }
+    }
+</script>
+{% endblock %}
